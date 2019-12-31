@@ -1,0 +1,23 @@
+{
+  "name": "products-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nonchalant-Narwhal/Products-Service.git"
+  },
+  "author": "Bryce Champaign",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nonchalant-Narwhal/Products-Service/issues"
+  },
+  "homepage": "https://github.com/Nonchalant-Narwhal/Products-Service#readme",
+  "dependencies": {
+    "csv-parser": "^2.3.2",
+    "pg": "^7.17.0"
+  }
+}
