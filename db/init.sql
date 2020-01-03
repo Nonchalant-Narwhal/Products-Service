@@ -9,7 +9,7 @@ CREATE TABLE products(
   id serial PRIMARY KEY,
   name VARCHAR(255),
   slogan VARCHAR(255),
-  description VARCHAR(255),
+  description text,
   category VARCHAR(255),
   default_price float
 );
@@ -17,12 +17,12 @@ CREATE TABLE products(
 CREATE TABLE related(
   id serial PRIMARY KEY,
   current_product_id INT REFERENCES products (id),
-  related_product_id INT REFERENCES products (id)
+  related_product_id INT 
 );
 
 CREATE TABLE features(
   id serial PRIMARY KEY,
-  product_id INT REFERENCES products( id),
+  product_id INT REFERENCES products(id),
   feature VARCHAR(255),
   value VARCHAR(255)
 );
@@ -31,9 +31,9 @@ CREATE TABLE styles(
   id serial PRIMARY KEY,
   product_id INT REFERENCES products (id),
   name VARCHAR(255),
+  sale_price VARCHAR(255),
   original_price FLOAT,
-  sale_price FLOAT,
-  _default INT
+  default_style INT
 );
 
 CREATE TABLE skus(
@@ -46,6 +46,33 @@ CREATE TABLE skus(
 CREATE TABLE photos(
   id serial PRIMARY KEY,
   style_id INT REFERENCES styles (id),
-  thumbnail_url VARCHAR(255),
-  url VARCHAR(255)
+  url text,
+  thumbnail_url text
 );
+
+CREATE INDEX product_index ON products (id);
+CREATE INDEX related_index ON related (current_product_id);
+CREATE INDEX features_index ON features (product_id);
+CREATE INDEX styles_index ON styles (product_id);
+CREATE INDEX skus_index ON skus (style_id);
+CREATE INDEX photos_index ON photos (style_id);
+
+COPY products FROM '/data/csv/product.csv' CSV HEADER;
+COPY related FROM '/data/csv/related.csv' CSV HEADER;
+COPY features FROM '/data/csv/features.csv' CSV HEADER;
+COPY styles FROM '/data/csv/styles.csv' CSV HEADER;
+COPY skus FROM '/data/csv/skus.csv' CSV HEADER;
+
+CREATE TEMPORARY TABLE tmp_table 
+AS
+SELECT * 
+FROM photos
+WITH NO DATA;
+
+
+COPY tmp_table FROM '/data/csv/photos.csv' CSV HEADER;
+
+INSERT INTO photos
+SELECT *
+FROM tmp_table
+ON CONFLICT DO NOTHING;
