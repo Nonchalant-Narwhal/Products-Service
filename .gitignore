@@ -104,3 +104,4 @@ dist
 .tern-port
 .csv
 docker-compose.yml
+package-lock.json
