@@ -11,5 +11,5 @@ services:
       - 5432:5432
     volumes:
       - type: bind
-        source: ../databaseMigration/data-csv
+        source: ./data-csv
         target: /data/csv
