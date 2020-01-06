@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "nodemon server/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,7 @@
   },
   "homepage": "https://github.com/Nonchalant-Narwhal/Products-Service#readme",
   "dependencies": {
-    "csv-parser": "^2.3.2",
+    "express": "^4.17.1",
     "jest": "^24.9.0",
     "pg": "^7.17.0"
   }

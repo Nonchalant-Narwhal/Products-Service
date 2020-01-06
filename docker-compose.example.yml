@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: your-password-here
+      POSTGRES_USER: your-user-here
+    ports:
+      - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+      - ./db/postgres-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - type: bind
+        source: ./db/data-csv
+        target: /data/csv
+  server:
+    image: brycechampaign/products-service-server
+    restart: always
+    environment:
+      PORT: 3000
+    ports:
+      - 3000:3000
+    links:
+      - 'db:database'
