@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "start": "nodemon server/index.js",
-    "build": "sudo docker build -t brycechampaign/products-service-server . && sudo docker push brycechampaign/products-service-server"
+    "test": "mocha ./tests",
+    "start": "nodemon src/index.js",
+    "build": "sudo docker build -t brycechampaign/products-service-server . && sudo docker push brycechampaign/products-service-server && sudo docker-compose up -d --no-deps --build server"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,12 @@
   },
   "homepage": "https://github.com/Nonchalant-Narwhal/Products-Service#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "express": "^4.17.1",
     "jest": "^24.9.0",
     "pg": "^7.17.0"
+  },
+  "devDependencies": {
+    "chakram": "^1.5.0"
   }
 }
