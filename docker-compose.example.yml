@@ -10,6 +10,8 @@ services:
     ports:
       - 5432:5432
     volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+      - ./db/postgres-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
       - type: bind
         source: ./db/data-csv
         target: /data/csv
@@ -20,3 +22,5 @@ services:
       PORT: 3000
     ports:
       - 3000:3000
+    links:
+      - 'db:database'
