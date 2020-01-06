@@ -6,3 +6,14 @@ module.exports.getProductList = async (offset, limit) => {
     limit
   ]);
 };
+
+module.exports.getProductById = async id => {
+  return await db.query('SELECT * FROM products where id = $1', [id]);
+};
+
+module.exports.getFeaturesByProductId = async productId => {
+  return await db.query(
+    'SELECT feature, value FROM features WHERE product_id = $1',
+    [productId]
+  );
+};
