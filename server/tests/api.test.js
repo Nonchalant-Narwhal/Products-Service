@@ -107,3 +107,31 @@ describe('Product Info endpoint', () => {
       });
   });
 });
+
+describe('Product Styles endpoint', () => {
+  it('Correctly retireves the correct style information', () => {
+    return chakram
+      .get('http://localhost:3000/products/1/styles')
+      .then(response => {
+        expect(response).to.have.status(200);
+        const styleInfo = response.body;
+
+        expect(styleInfo.product_id).to.equal(1);
+        expect(styleInfo.results).to.be.an('array');
+        expect(styleInfo.results.length).to.equal(6);
+        expect(styleInfo.results[0].photos.length).to.equal(6);
+        return chakram.wait();
+      });
+  });
+
+  it('Responds with 404 status if an invalid product ID is passed in', () => {
+    return chakram
+      .get(
+        'http://localhost:3000/products/1000000000000000000000000000000/styles'
+      )
+      .then(response => {
+        expect(response).to.have.status(404);
+        return chakram.wait();
+      });
+  });
+});
