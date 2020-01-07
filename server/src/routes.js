@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   getProductList,
   getProductInfoById,
-  getStyles
+  getStyles,
+  getRelated
 } = require('./controllers');
 
 router.get('/products/list', async (req, res) => {
@@ -32,7 +33,16 @@ router.get('/products/:product_id/styles', async (req, res) => {
     const styles = await getStyles(productId);
     res.send(styles);
   } catch (err) {
-    console.error(err);
+    res.sendStatus(404);
+  }
+});
+
+router.get('/products/:product_id/related', async (req, res) => {
+  try {
+    const { product_id: productId } = req.params;
+    const related = await getRelated(productId);
+    res.send(related);
+  } catch (err) {
     res.sendStatus(404);
   }
 });

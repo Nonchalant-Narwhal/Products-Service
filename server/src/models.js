@@ -35,3 +35,9 @@ module.exports.getPhotos = async styleId => {
 module.exports.getSkus = async styleId => {
   return await db.query('SELECT * FROM skus WHERE style_id = $1', [styleId]);
 };
+
+module.exports.getRelated = async productId =>
+  await db.query(
+    'SELECT related_product_id FROM related WHERE current_product_id = $1',
+    [productId]
+  );
