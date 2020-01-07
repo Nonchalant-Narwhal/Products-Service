@@ -16,7 +16,7 @@ module.exports.getProductList = async (offset, limit) => {
   return list;
 };
 
-module.exports.getProductById = async id => {
+module.exports.getProductAndFeaturesById = async id => {
   const client = await db.connect();
   const product = await client
     .query('SELECT * FROM products where id = $1', [id])
@@ -25,23 +25,15 @@ module.exports.getProductById = async id => {
       throw new Error(err);
     });
 
-  client.release();
-  return product;
-};
-
-module.exports.getFeaturesByProductId = async productId => {
-  const client = await db.connect();
   const features = await client
-    .query('SELECT feature, value FROM features WHERE product_id = $1', [
-      productId
-    ])
+    .query('SELECT feature, value FROM features WHERE product_id = $1', [id])
     .catch(err => {
       client.release();
       throw new Error(err);
     });
 
   client.release();
-  return features;
+  return { product, features };
 };
 
 module.exports.getStyles = async productId => {
