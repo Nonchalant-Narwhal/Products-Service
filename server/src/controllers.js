@@ -18,3 +18,31 @@ module.exports.getProductInfoById = async id => {
   features.rows.forEach(feature => productInfo.features.push(feature));
   return productInfo;
 };
+
+module.exports.getStyles = async productId => {
+  const styleInfo = { product_id: Number(productId) };
+  let styles = await models.getStyles(productId).then(results => results.rows);
+
+  styles = await Promise.all(
+    styles.map(async style => {
+      const parsedSkus = {};
+      const photos = await models.getPhotos(style.style_id);
+      await models.getSkus(style.style_id).then(skus => {
+        return skus.rows.forEach(sku => (parsedSkus[sku.size] = sku.quantity));
+      });
+
+      if (style.sale_price === 'null') style.sale_price = 0;
+
+      style = {
+        ...style,
+        photos: photos.rows,
+        skus: parsedSkus
+      };
+
+      return style;
+    })
+  );
+
+  styleInfo.results = styles;
+  return styleInfo;
+};

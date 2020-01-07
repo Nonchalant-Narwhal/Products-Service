@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getProductList, getProductInfoById } = require('./controllers');
+const {
+  getProductList,
+  getProductInfoById,
+  getStyles
+} = require('./controllers');
 
 router.get('/products/list', async (req, res) => {
   try {
@@ -18,6 +22,17 @@ router.get('/products/:id', async (req, res) => {
     const productInfo = await getProductInfoById(id);
     res.send(productInfo);
   } catch (err) {
+    res.sendStatus(404);
+  }
+});
+
+router.get('/products/:product_id/styles', async (req, res) => {
+  try {
+    const { product_id: productId } = req.params;
+    const styles = await getStyles(productId);
+    res.send(styles);
+  } catch (err) {
+    console.error(err);
     res.sendStatus(404);
   }
 });
