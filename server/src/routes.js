@@ -13,7 +13,6 @@ router.get('/products/list', async (req, res) => {
     const list = await getProductList(page, count);
     res.send(list);
   } catch (err) {
-    console.error(err);
     res.sendStatus(404);
   }
 });
