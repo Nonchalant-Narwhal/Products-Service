@@ -3,7 +3,10 @@ const db = require('./db');
 module.exports.getProductList = async (offset, limit) => {
   const client = await db.connect();
   const list = await client
-    .query('SELECT * FROM products OFFSET $1 LIMIT $2', [offset, limit])
+    .query('SELECT * FROM products ORDER BY id OFFSET $1 LIMIT $2', [
+      offset,
+      limit
+    ])
     .catch(err => {
       client.release();
       throw new Error(err);
