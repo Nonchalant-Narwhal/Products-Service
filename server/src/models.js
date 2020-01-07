@@ -48,36 +48,44 @@ module.exports.getStyles = async productId => {
       throw new Error(err);
     });
 
+  const styleList = await Promise.all(
+    styles.rows.map(async style => {
+      const parsedSkus = {};
+      const photos = await client
+        .query('SELECT thumbnail_url, url FROM photos WHERE style_Id = $1', [
+          style.style_id
+        ])
+        .catch(err => {
+          client.release();
+          throw new Error(err);
+        });
+
+      await client
+        .query('SELECT * FROM skus WHERE style_id = $1', [style.style_id])
+        .then(skus =>
+          skus.rows.forEach(sku => {
+            parsedSkus[sku.size] = sku.quantity;
+          })
+        )
+        .catch(err => {
+          client.release();
+          throw new Error(err);
+        });
+
+      if (style.sale_price === 'null') style.sale_price = 0;
+
+      styleInfo = {
+        ...style,
+        photos: photos.rows,
+        skus: parsedSkus
+      };
+
+      return styleInfo;
+    })
+  );
+
   client.release();
-  return styles;
-};
-
-module.exports.getPhotos = async styleId => {
-  const client = await db.connect();
-  const photos = await client
-    .query('SELECT thumbnail_url, url FROM photos WHERE style_Id = $1', [
-      styleId
-    ])
-    .catch(err => {
-      client.release();
-      throw new Error(err);
-    });
-
-  client.release();
-  return photos;
-};
-
-module.exports.getSkus = async styleId => {
-  const client = await db.connect();
-  const skus = await client
-    .query('SELECT * FROM skus WHERE style_id = $1', [styleId])
-    .catch(err => {
-      client.release();
-      throw new Error(err);
-    });
-
-  client.release();
-  return skus;
+  return styleList;
 };
 
 module.exports.getRelated = async productId => {
