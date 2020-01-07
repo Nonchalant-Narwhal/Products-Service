@@ -135,3 +135,27 @@ describe('Product Styles endpoint', () => {
       });
   });
 });
+
+describe('Related Products endpoint', () => {
+  it('returns correct list of related products', () => {
+    return chakram
+      .get('http://localhost:3000/products/1/related')
+      .then(response => {
+        expect(response).to.have.status(200);
+        expect(response.body.length).to.equal(4);
+        expect(response.body).to.deep.equal([2, 3, 8, 7]);
+        return chakram.wait();
+      });
+  });
+
+  it('responds with a 404 status if product id is invalid', () => {
+    return chakram
+      .get(
+        'http://localhost:3000/products/1000000000000000000000000000000/related'
+      )
+      .then(response => {
+        expect(response).to.have.status(404);
+        return chakram.wait();
+      });
+  });
+});
