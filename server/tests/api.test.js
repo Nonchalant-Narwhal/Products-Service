@@ -8,6 +8,7 @@ describe('Product List endpoint', () => {
   beforeEach(() => {
     testData = mockData.listData;
   });
+
   it('Gets correct list of products when no parameters are provided', () => {
     return chakram.get('http://localhost:3000/products/list').then(response => {
       expect(response).to.have.status(200);
