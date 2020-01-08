@@ -8,6 +8,7 @@ describe('Product List endpoint', () => {
   beforeEach(() => {
     testData = mockData.listData;
   });
+
   it('Gets correct list of products when no parameters are provided', () => {
     return chakram.get('http://localhost:3000/products/list').then(response => {
       expect(response).to.have.status(200);
@@ -128,6 +129,30 @@ describe('Product Styles endpoint', () => {
     return chakram
       .get(
         'http://localhost:3000/products/1000000000000000000000000000000/styles'
+      )
+      .then(response => {
+        expect(response).to.have.status(404);
+        return chakram.wait();
+      });
+  });
+});
+
+describe('Related Products endpoint', () => {
+  it('returns correct list of related products', () => {
+    return chakram
+      .get('http://localhost:3000/products/1/related')
+      .then(response => {
+        expect(response).to.have.status(200);
+        expect(response.body.length).to.equal(4);
+        expect(response.body).to.deep.equal([2, 3, 8, 7]);
+        return chakram.wait();
+      });
+  });
+
+  it('responds with a 404 status if product id is invalid', () => {
+    return chakram
+      .get(
+        'http://localhost:3000/products/1000000000000000000000000000000/related'
       )
       .then(response => {
         expect(response).to.have.status(404);

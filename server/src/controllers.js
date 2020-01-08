@@ -46,3 +46,9 @@ module.exports.getStyles = async productId => {
   styleInfo.results = styles;
   return styleInfo;
 };
+
+module.exports.getRelated = async productId => {
+  return await models
+    .getRelated(productId)
+    .then(related => related.rows.map(related => related.related_product_id));
+};
