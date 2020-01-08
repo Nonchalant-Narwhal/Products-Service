@@ -10,8 +10,7 @@ module.exports.getProductList = async (page, count) => {
 };
 
 module.exports.getProductInfoById = async id => {
-  const product = await models.getProductById(id);
-  const features = await models.getFeaturesByProductId(id);
+  const { product, features } = await models.getProductAndFeaturesById(id);
 
   productInfo = product.rows[0];
   productInfo.features = [];
