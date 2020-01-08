@@ -17,3 +17,21 @@ module.exports.getFeaturesByProductId = async productId => {
     [productId]
   );
 };
+
+module.exports.getStyles = async productId => {
+  return await db.query(
+    'SELECT id AS style_id, name, original_price, sale_price, default_style AS "default?" FROM styles WHERE product_id = $1',
+    [productId]
+  );
+};
+
+module.exports.getPhotos = async styleId => {
+  return await db.query(
+    'SELECT thumbnail_url, url FROM photos WHERE style_Id = $1',
+    [styleId]
+  );
+};
+
+module.exports.getSkus = async styleId => {
+  return await db.query('SELECT * FROM skus WHERE style_id = $1', [styleId]);
+};
