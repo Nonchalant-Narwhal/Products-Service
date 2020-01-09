@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+  server:
+    image: brycechampaign/products-service-server
+    restart: always
+    environment:
+      PORT: 3000
+      DB_USER: your-database-username-here
+      DB_PASSWORD: your-database-password-here
+      DB_HOST: your-db-ip-here
+    ports:
+      - 3000:3000
