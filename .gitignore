@@ -105,3 +105,4 @@ dist
 .csv
 docker-compose.yml
 package-lock.json
+config.js
