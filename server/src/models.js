@@ -38,59 +38,50 @@ module.exports.getProductAndFeaturesById = async id => {
 
 module.exports.getStyles = async productId => {
   const client = await db.connect();
-  const styleIds = await client
-    .query('SELECT id FROM styles WHERE product_id = $1', [productId])
-    .then(data => data.rows.map(idObj => Number(idObj.id)))
+
+  const styleList = await client
+    .query(
+      `select id as style_id, name, original_price, sale_price, default_style as "default?",
+          (
+            select array_to_json(array_agg(row_to_json(p)))
+            from (
+              select url, thumbnail_url
+              from photos
+              where style_id=styles.id
+              order by id asc
+            ) p
+          ) as photos,
+        (
+            select array_to_json(array_agg(row_to_json(sk)))
+            from (
+              select size, quantity
+              from skus
+              where style_id=styles.id
+              order by id asc
+            ) sk
+          ) as skus
+        from (SELECT * FROM styles WHERE product_id = $1) as styles     
+         `,
+      [productId]
+    )
+    .then(styles => {
+      styles = styles.rows;
+
+      styles.forEach(style => {
+        if (style.sale_price === 'null') style.sale_price = 0;
+        else style.sale_price = Number(style.sale_price);
+
+        const skus = {};
+        style.skus.forEach(sku => (skus[sku.size] = sku.quantity));
+        style.skus = skus;
+      });
+
+      return styles;
+    })
     .catch(err => {
       client.release();
       throw new Error(err);
     });
-
-  styleList = await Promise.all(
-    styleIds.map(async id => {
-      return await client
-        .query(
-          `
-            select id as style_id, name, original_price, sale_price, default_style as "default?",
-              (
-                select array_to_json(array_agg(row_to_json(p)))
-                from (
-                  select url, thumbnail_url
-                  from photos
-                  where style_id=styles.id
-                  order by id asc
-                ) p
-              ) as photos,
-            (
-                select array_to_json(array_agg(row_to_json(sk)))
-                from (
-                  select size, quantity
-                  from skus
-                  where style_id=styles.id
-                  order by id asc
-                ) sk
-              ) as skus
-            from styles
-            where styles.id = $1      
-         `,
-          [id]
-        )
-        .then(style => {
-          style = style.rows[0];
-
-          if (style.sale_price === 'null') style.sale_price = 0;
-          else style.sale_price = Number(style.sale_price);
-
-          const skus = {};
-          style.skus.forEach(sku => (skus[sku.size] = sku.quantity));
-          style.skus = skus;
-          return style;
-        });
-    })
-  ).catch(err => {
-    client.release();
-    throw new Error(err);
-  });
 
   client.release();
   return styleList;
