@@ -38,46 +38,62 @@ module.exports.getProductAndFeaturesById = async id => {
 
 module.exports.getStyles = async productId => {
   const client = await db.connect();
-  const styles = await client
-    .query(
-      'SELECT id AS style_id, name, original_price, sale_price, default_style AS "default?" FROM styles WHERE product_id = $1',
-      [productId]
-    )
+  const styleIds = await client
+    .query('SELECT id FROM styles WHERE product_id = $1', [productId])
+    .then(data => data.rows.map(idObj => Number(idObj.id)))
     .catch(err => {
       client.release();
       throw new Error(err);
     });
 
+  styleList = await Promise.all(
+    styleIds.map(async id => {
+      return await client
+        .query(
+          `
+            select id as style_id, name, original_price, sale_price, default_style as "default?",
+              (
+                select array_to_json(array_agg(row_to_json(p)))
+                from (
+                  select url, thumbnail_url
+                  from photos
+                  where style_id=styles.id
+                  order by id asc
+                ) p
+              ) as photos,
+            (
+                select array_to_json(array_agg(row_to_json(sk)))
+                from (
+                  select size, quantity
+                  from skus
+                  where style_id=styles.id
+                  order by id asc
+                ) sk
+              ) as skus
+            from styles
+            where styles.id = $1      
+         `,
+          [id]
+        )
+        .then(style => {
+          style = style.rows[0];
+
+          if (style.sale_price === 'null') style.sale_price = 0;
+          else style.sale_price = Number(style.sale_price);
+
+          const skus = {};
+          style.skus.forEach(sku => (skus[sku.size] = sku.quantity));
+          style.skus = skus;
+          return style;
+        });
+    })
+  ).catch(err => {
+    client.release();
+    throw new Error(err);
+  });
+
   client.release();
-  return styles;
-};
-
-module.exports.getPhotos = async styleId => {
-  const client = await db.connect();
-  const photos = await client
-    .query('SELECT thumbnail_url, url FROM photos WHERE style_Id = $1', [
-      styleId
-    ])
-    .catch(err => {
-      client.release();
-      throw new Error(err);
-    });
-
-  client.release();
-  return photos;
-};
-
-module.exports.getSkus = async styleId => {
-  const client = await db.connect();
-  const skus = await client
-    .query('SELECT * FROM skus WHERE style_id = $1', [styleId])
-    .catch(err => {
-      client.release();
-      throw new Error(err);
-    });
-
-  client.release();
-  return skus;
+  return styleList;
 };
 
 module.exports.getRelated = async productId => {
