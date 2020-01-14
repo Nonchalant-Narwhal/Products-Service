@@ -72,7 +72,10 @@ module.exports.getStyles = async productId => {
         else style.sale_price = Number(style.sale_price);
 
         const skus = {};
-        style.skus.forEach(sku => (skus[sku.size] = sku.quantity));
+        if (style.skus !== null) {
+          style.skus.forEach(sku => (skus[sku.size] = sku.quantity));
+        }
+
         style.skus = skus;
       });
 
