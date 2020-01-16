@@ -20,27 +20,7 @@ module.exports.getProductInfoById = async id => {
 
 module.exports.getStyles = async productId => {
   const styleInfo = { product_id: Number(productId) };
-  let styles = await models.getStyles(productId).then(results => results.rows);
-
-  styles = await Promise.all(
-    styles.map(async style => {
-      const parsedSkus = {};
-      const photos = await models.getPhotos(style.style_id);
-      await models.getSkus(style.style_id).then(skus => {
-        return skus.rows.forEach(sku => (parsedSkus[sku.size] = sku.quantity));
-      });
-
-      if (style.sale_price === 'null') style.sale_price = 0;
-
-      style = {
-        ...style,
-        photos: photos.rows,
-        skus: parsedSkus
-      };
-
-      return style;
-    })
-  );
+  let styles = await models.getStyles(productId);
 
   styleInfo.results = styles;
   return styleInfo;
