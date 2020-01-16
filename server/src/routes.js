@@ -37,9 +37,8 @@ router.get('/products/:product_id/styles', async (req, res) => {
     if (cachedResult === null) {
       styles = await getStyles(productId);
       cache.hset('styles', productId, JSON.stringify(styles));
-      cache.expire('styles', 60);
     } else {
-      styles = cachedResult;
+      styles = JSON.parse(cachedResult);
     }
 
     res.send(styles);
