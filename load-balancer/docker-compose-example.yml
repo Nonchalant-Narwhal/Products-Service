@@ -1,0 +1,12 @@
+version: '3.2'
+
+services:
+  server:
+    image: brycechampaign/products-service-load-balancer
+    restart: always
+    environment:
+      PORT: 3000
+      HOST_1: your_first_host_ip_address
+      HOST_2: your_second_host_ip_address
+    ports:
+      - 3000:3000

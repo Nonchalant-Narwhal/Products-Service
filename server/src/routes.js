@@ -12,7 +12,6 @@ router.get('/products/list', async (req, res) => {
   try {
     let { page, count } = req.query;
     const list = await getProductList(page, count);
-    redis.cache(req, list, redis.print);
     res.send(list);
   } catch (err) {
     res.sendStatus(404);
@@ -38,7 +37,7 @@ router.get('/products/:product_id/styles', async (req, res) => {
     if (cachedResult === null) {
       styles = await getStyles(productId);
       cache.hset('styles', productId, JSON.stringify(styles));
-      cache.expire('styles', 30);
+      cache.expire('styles', 60);
     } else {
       styles = cachedResult;
     }
@@ -59,8 +58,8 @@ router.get('/products/:product_id/related', async (req, res) => {
   }
 });
 
-router.get('/loaderio-030d75ecd0bf9bcdfe6114de03053420', (req, res) => {
-  res.send('loaderio-030d75ecd0bf9bcdfe6114de03053420');
+router.get(`/${process.env.LOADER_KEY}`, (req, res) => {
+  res.send(process.env.LOADER_KEY);
 });
 
 module.exports = router;
