@@ -21,14 +21,14 @@ The `/products/list` endpoint returns a paginated list of products. It accepts `
 * **count**: number of products to return per-page
 * **page**: selected page of products to return
 
-### Get styles
+### Styles
 
 The `/products/:product_id/styles` endpoint retrieves the list of styles for a given product.
 
 #### Parameters
 * **product_id**: The ID of the product associated with the requested styles
 
-### Get related products
+### Related products
 The `/products/:product_id/related` endpoint returns a list of related product IDs.
 
 #### Parameters
